@@ -1,7 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 
-import LiquidEther from "./LiquidEther";
+import LiquidEther from "./ui/LiquidEther";
 import GooeyNav from "./GooeyNav";
 
 const Navbar = () => {
@@ -31,7 +31,7 @@ const Navbar = () => {
         </nav>
       </header>
 
-      <div className="absolute inset-0 top-0 z-[-1] min-h-screen">
+      <div className="fixed inset-0 top-0 z-[-1] min-h-screen">
         <LiquidEther
           mouseForce={20}
           cursorSize={100}

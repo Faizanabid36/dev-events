@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import StarBorder from "./StarBorder/StarBorder";
+import StarBorder from "./ui/StarBorder/StarBorder";
 
 const ExploreButton = () => {
   return (
