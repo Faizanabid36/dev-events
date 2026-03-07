@@ -5,6 +5,7 @@ import { createBooking } from "@/libs/actions/booking.actions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { toast } from "sonner";
 
 const BookEvent = ({ eventId, slug }: { eventId: string; slug: string }) => {
   const [email, setEmail] = useState("");
@@ -15,12 +16,13 @@ const BookEvent = ({ eventId, slug }: { eventId: string; slug: string }) => {
     e.preventDefault();
     setIsLoading(true);
 
-    const { success } = await createBooking({ eventId, slug, email });
+    const { success, message } = await createBooking({ eventId, slug, email });
 
     if (success) {
       setSubmitted(true);
+      toast.success("Event booked successfully!");
     } else {
-      console.error("Booking creation failed");
+      toast.error(message || "Failed to book event. Please try again.");
     }
     setIsLoading(false);
   };
