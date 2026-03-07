@@ -110,8 +110,7 @@ const EventSchema = new Schema<IEvent>(
   },
 );
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-EventSchema.pre("save", function (next: any) {
+EventSchema.pre("save", async function () {
   const event = this as IEvent;
 
   // Generate slug only if title changed or document is new
@@ -128,8 +127,6 @@ EventSchema.pre("save", function (next: any) {
   if (event.isModified("time")) {
     event.time = normalizeTime(event.time);
   }
-
-  next();
 });
 
 EventSchema.index({ slug: 1 }, { unique: true });
