@@ -1,7 +1,9 @@
 import { notFound } from "next/navigation";
+import Image from "next/image";
+import { cacheLife } from "next/cache";
+
 import { IEvent } from "@/database";
 import { getSimilarEventsBySlug } from "@/libs/actions/event.actions";
-import Image from "next/image";
 import BookEvent from "@/components/BookEvent";
 import EventCard from "@/components/EventCard";
 
@@ -44,6 +46,8 @@ const EventTags = ({ tags }: { tags: string[] }) => (
 );
 
 const EventDetails = async ({ params }: { params: string }) => {
+  "use cache";
+  cacheLife("hours");
   const slug = params;
 
   let event;
