@@ -3,6 +3,19 @@
 import Booking from "@/database/booking.model";
 import connectDB from "../db";
 import { createBookingSchema } from "../validation/booking.schema";
+import { createRequestsMinuteLimiter } from "../rate-limit";
+import { headers } from "next/headers";
+
+// Create a rate limiter for bookings (e.g., 5 bookings per minute per IP)
+const bookingLimiter = createRequestsMinuteLimiter(5);
+
+const getClientIp = async () => {
+  const h = await headers();
+  const forwarded = h.get("x-forwarded-for");
+  const realIp = h.get("x-real-ip");
+  const ip = forwarded || realIp || "unknown";
+  return String(ip).split(",")[0].trim() || "unknown";
+};
 
 export const createBooking = async ({
   eventId,
@@ -14,6 +27,18 @@ export const createBooking = async ({
   email: string;
 }) => {
   try {
+    // Rate limit check
+    const ip = await getClientIp();
+    const rateLimitResult = bookingLimiter.checkByIp(ip);
+    if (rateLimitResult.isLimited) {
+      return {
+        success: false,
+        message:
+          rateLimitResult.message ||
+          "Too many requests, please try again later.",
+      };
+    }
+
     await connectDB();
 
     // Validate input

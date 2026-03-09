@@ -4,9 +4,16 @@ import { v2 as cloudinary } from "cloudinary";
 import connectDB from "@/libs/db";
 import Event from "@/database/event.model";
 import { createEventSchema } from "@/libs/validation/event.schema";
+import { createRequestsMinuteLimiter } from "@/libs/rate-limit";
+
+const limiter = createRequestsMinuteLimiter(2);
 
 export async function POST(req: NextRequest) {
   try {
+    const { isLimited, response } = limiter.check(req);
+    if (isLimited) {
+      return response!;
+    }
     await connectDB();
 
     const formData = await req.formData();
@@ -81,7 +88,11 @@ export async function POST(req: NextRequest) {
     });
 
     return NextResponse.json(
-      { success: true, message: "Event created successfully", event: createdEvent },
+      {
+        success: true,
+        message: "Event created successfully",
+        event: createdEvent,
+      },
       { status: 201 },
     );
   } catch (e) {
@@ -93,8 +104,13 @@ export async function POST(req: NextRequest) {
   }
 }
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   try {
+    const isRateLimited = limiter.check(req);
+    if (isRateLimited.isLimited) {
+      console.log({ isRateLimited });
+      return isRateLimited.response!;
+    }
     await connectDB();
 
     const events = await Event.find().sort({ createdAt: -1 });
