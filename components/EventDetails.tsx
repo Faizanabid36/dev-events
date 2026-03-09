@@ -45,10 +45,10 @@ const EventTags = ({ tags }: { tags: string[] }) => (
   </div>
 );
 
-const EventDetails = async ({ params }: { params: string }) => {
+const EventDetails = async ({ params }: { params: Promise<{ slug: string }> }) => {
   "use cache";
   cacheLife("hours");
-  const slug = params;
+  const slug = (await params).slug;
 
   let event;
   try {
